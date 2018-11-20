@@ -1,0 +1,36 @@
+import com.alibaba.fastjson.JSON;
+import com.jyb.vo.StreamingOptions;
+import com.jyb.structed.base.AbstractWindowsStreaming;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.functions;
+import com.jyb.vo.StreamingWindowsOptions;
+import java.io.Serializable;
+import org.apache.spark.api.java.function.MapFunction;
+import com.jyb.vo.StreamingWindowsOptions;
+
+public class $beanStreaming extends AbstractWindowsStreaming implements Serializable{
+
+
+    public static void main(String[] args)throws Exception {
+        $beanStreaming windows = new $beanStreaming();
+        windows.createOption(args);
+        windows.run();
+    }
+
+
+    @Override
+    protected void registerTable(Dataset<Row> df) {
+        df.map((MapFunction<Row,$bean>) f->{
+            String json = f.getString(0);
+
+            $bean bean = JSON.parseObject(json,
+                    $bean.class);
+            return bean;
+        }, Encoders.bean($bean.class)).createOrReplaceTempView(options.getBasicOptions().getStreamTable());
+
+    }
+
+
+}

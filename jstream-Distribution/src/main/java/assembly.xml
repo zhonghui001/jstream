@@ -1,0 +1,50 @@
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+    <id>assembly</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <moduleSets>
+        <moduleSet>
+
+            <!-- Enable access to all projects in the current multimodule build! -->
+            <useAllReactorProjects>true</useAllReactorProjects>
+
+            <!-- Now, select which projects to include in this module-set. -->
+            <includes>
+                <include>com.jyb.stream:jstream-controller</include>
+                <include>com.jyb.stream:jstream-core</include>
+                <include>com.jyb.stream:jstream-server</include>
+            </includes>
+            <binaries>
+                <outputDirectory>lib</outputDirectory>
+                <unpack>false</unpack>
+            </binaries>
+        </moduleSet>
+    </moduleSets>
+
+    <fileSets>
+        <fileSet>
+            <directory>src/main/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>../jstream-controller/src/main/webapp</directory>
+            <outputDirectory>webapp</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/conf</directory>
+            <outputDirectory>conf</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        <fileSet>
+            <directory>src/main/extlib</directory>
+            <outputDirectory>extlib</outputDirectory>
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets>
+
+</assembly>

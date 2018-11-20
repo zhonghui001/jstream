@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>jobmanager</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 10px 50px;
+            font-size: 16px;
+        }
+        .row {
+            line-height: 40px;
+            margin-left: 20px;
+        }
+        button {
+            margin: 0 10px
+        }
+        button a{
+            color:#fff;
+        }
+        h2 {
+            border-bottom: 1px solid #ccc;
+            height: 50px;
+            text-align: center
+        }
+    </style>
+    <script src="js/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/list.js"></script>
+</head>
+<body>
+
+
+
+<h2>JobManager</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-md-7"><label>job列表</label></div>
+        <div class="col-md-5">
+            <button class="btn btn-primary" onclick='window.location.href="index.html"'>刷新</button>
+            <button class="btn btn-primary" onclick='window.location.href="sql.html"'>新建StreamSql任务</button>
+        </div>
+    </div>
+
+    <div class="row" id="rowHead">
+        <div class="col-md-1">任务id</div>
+        <div class="col-md-1">app名称</div>
+        <div class="col-md-2">任务状态</div>
+
+        <div class="col-md-2">yarnId</div>
+        <div class="col-md-1">yarnState</div>
+        <div class="col-md-4">操作</div>
+    </div>
+
+</div>
+
+</body>
+</html>

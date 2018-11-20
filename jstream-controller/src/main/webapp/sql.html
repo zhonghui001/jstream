@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>sql</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>jobmanager</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/sql.js"></script>
+    <style>
+        h2 {
+            border-bottom: 1px solid #ccc;
+            height: 50px;
+            text-align: center
+        }
+        .source {
+            border:1px dashed #000;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            height: 234px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .sql{
+            border:1px dashed #000;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            height: 234px;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+        .row{
+            margin-top: 10px;
+        }
+
+        .bottom-btn{
+            margin-bottom: 30px;
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>stream sql</h2>
+    <form class="form-inline" id="aform">
+        <!-- ext config begin -->
+        <div class="container ">
+            <div class="row ">
+                <div class="col-md-12 breadcrumb"><strong >ext config</strong></div>
+            </div>
+            <div class="row ">
+
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">app名称</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="" name="appName" value="myapp">
+                        <input type="hidden" name="id">
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                </div>
+            </div>
+        </div>
+        <!-- ext config end -->
+
+        <!--source begin -->
+        <div class="container ">
+            <div class="row ">
+                <div class="col-md-12 breadcrumb"><strong >source</strong></div>
+            </div>
+            <div class="row ">
+
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">type</label>
+                    <div class="col-md-8">
+                        <select class="form-control" name="sourceType">
+                            <option>kafka</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">kafka server</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="如：10.23.181.177:9092,0.23.107.174:9092" name="server" value="10.23.181.177:9092,0.23.107.174:9092">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">goupId</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="可以不填" name="groupId">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">模式</label>
+                    <div class="col-md-8">
+                        <select class="form-control" name="offsetMode">
+                            <option>latest</option>
+                            <option>earlest</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">topic</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="如：dbjyb" name="topic" value="dbjyb">
+                    </div>
+                </div>
+                <div class="col-md-6">
+
+                </div>
+            </div>
+        </div>
+        <!--source end -->
+
+        <!--sql begin -->
+        <div class="container ">
+            <div class="row ">
+                <div class="col-md-12 breadcrumb"><strong >sql</strong>
+                    <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="内置了一张source表为topic,可以使用with ( select clause ) as topic2进行创建一张新的view,后续可以使用该view的名字进行计算"></span>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col-md-12">
+                    <textarea rows="12" wrap="hard" class="form-control" cols="140" name="sql"
+                              placeholder="with ( select get_json_object(value,'$.dbTable') dbtable,get_json_object(value,'$.update_time') update_time  from topic) as topic2;\r\nselect count(1) from topic2;">
+                        with(select get_json_object(value,'$.dbTable') dbtable,get_json_object(value,'$.update_time') update_time  from topic ) as topic2;
+                        select count(1) from topic2;
+                    </textarea>
+                </div>
+
+            </div>
+        </div>
+        <!--sql end -->
+
+        <!-- sink begin -->
+        <div class="container ">
+            <div class="row ">
+                <div class="col-md-12 breadcrumb"><strong >sink</strong></div>
+            </div>
+
+            <div class="row notice">
+
+            </div>
+
+            <div class="row collapse error">
+                <div class="alert alert-danger">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <h4>警告！</h4>
+                    <li>该类型暂不支持</li>
+                </div>
+
+            </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">outPutMode</label>
+                    <div class="col-md-8">
+                        <select class="form-control" name="outPutMode">
+                            <option>append</option>
+                            <option selected="selected">complete</option>
+                            <option>update</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">触发间隔
+                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="两个批次之间的间隔时间如：2 seconds，不填写则是默认的as soon as it can"></span>
+                    </label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="两个批次之间的间隔时间如：2 seconds，不填写则是默认的as soon as it can" name="processInterval">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">sink类型</label>
+                    <div class="col-md-8">
+                        <select class="form-control " name="sinkType" id="sinkType">
+                            <option>console</option>
+                            <option>kafka</option>
+                            <option>mysql</option>
+                            <option>hbase</option>
+                            <option>es</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                </div>
+            </div>
+
+            <!-- mysql sink collapse -->
+            <div class="container mysql  collapse">
+                <div class="row">
+                    <div class="row ">
+                        <div class="col-md-12 text-muted"><strong >mysql sink</strong></div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">url</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="jdbc:mysql://10.23.95.97:3306" name="mysqlSinkUrl" value="jdbc:mysql://10.23.95.97:3306">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">用户名
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="jyb" name="mysqlSinkUserName" value="jyb">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">密码</label>
+                            <div class="col-md-8">
+                                <input type="password" class="form-control" placeholder="" name="mysqlSinkPassword" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">数据库名称
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="test" name="mysqlSinkDbName" value="test">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">表</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="" name="mysqlSinkTable" >
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- console sink -->
+            <div class="container console">
+                <div class="row">
+                    <div class="row ">
+                        <div class="col-md-12 text-muted"><strong >console sink</strong></div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">显示行数</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="效果如sql中的limit，如：10" name="numRows" value="10">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">是否截断
+                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="如果columns的字段内容过长，是否进行截断" ></span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control " name="truncate">
+                                    <option>true</option>
+                                    <option>false</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- sink end -->
+
+        <!-- 按钮 -->
+        <div class="container bottom-btn ">
+            <div class="row">
+                <div class="col-md-5"></div>
+                <div class="col-md-7">
+                    <button class="btn btn-primary" type="button" id="save">保存</button>
+                    <button class="btn" type="button" onclick='window.location.href="index.html"'>返回</button>
+                </div>
+            </div>
+        </div>
+
+
+
+    </form>
+
+</div>
+
+</body>
+</html>

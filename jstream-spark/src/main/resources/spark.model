@@ -1,0 +1,39 @@
+import com.alibaba.fastjson.JSON;
+import com.jyb.structed.base.AbstractStreaming;
+import org.apache.spark.api.java.function.MapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+
+import java.io.Serializable;
+import com.jyb.vo.StreamingOptions;
+/**
+ * /data/spark/bin/spark-submit --master yarn-client --class com.jyb.structed.SimpleSparkStreaming sparkJava-1.0-SNAPSHOT.jar "{\"applicationName\":\"sample\",\"format\":\"console\",\"kafka_broker\":\"10.23.181.177:9092,0.23.107.174:9092\",\"outMode\":\"append\",\"sql\":\"select * from liu\",\"streamTable\":\"liu\",\"topic\":\"dbjyb\"}
+ */
+public class $beanStreaming extends AbstractStreaming implements Serializable {
+
+
+
+
+    /**
+     *
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        $beanStreaming sample = new $beanStreaming();
+        sample.createOption(args);
+        sample.run();
+    }
+
+    @Override
+    protected void registerTable(Dataset<Row> df) {
+        df.map((MapFunction<Row,$bean>) f->{
+            String json = f.getString(0);
+
+            $bean order = JSON.parseObject(json,
+                    $bean.class);
+            return order;
+        }, Encoders.bean($bean.class)).createOrReplaceTempView(options.getBasicOptions().getStreamTable());
+    }
+}
