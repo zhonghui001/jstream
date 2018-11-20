@@ -21,7 +21,7 @@ fi
 
 #HADOOP_CONF_DIR=/etc/hadoop/conf
 #
-exec java $GRAPHX_OPTS -cp lib/*: -Dconfig=conf/jstream.properties -Dlog4j.file=conf/sylph-log4j.properties $mainClass 18080 "$@"
+exec java $GRAPHX_OPTS -cp lib/*: -Dconfig=conf/jstream.properties  $mainClass 18080 "$@"
 
 
 nohup $cmd > ${0%/*}/../logs/web.log 2>&1 &
