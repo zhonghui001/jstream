@@ -1,11 +1,12 @@
 package com.jyb.shell;
 
 
-import org.apache.commons.crypto.utils.IoUtils;
-import org.apache.commons.exec.*;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.exec.CommandLine;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.PumpStreamHandler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
 
 
 public class Shell {

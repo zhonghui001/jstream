@@ -4,6 +4,17 @@ import javax.ws.rs.FormParam;
 
 
 public class JobModel {
+    @FormParam("master")
+    String master;
+
+    @FormParam("driverMemory")
+    String driverMemory;
+    @FormParam("executorMemory")
+    String executorMemory;
+    @FormParam("executorCores")
+    String executorCores;
+    @FormParam("numExecutors")
+    String numExecutors;
 
     @FormParam("id")
     String id;
@@ -54,6 +65,23 @@ public class JobModel {
     String mysqlSinkDbName;
     @FormParam("mysqlSinkTable")
     String mysqlSinkTable;
+
+    //kafka sink
+    @FormParam("kafkaSinkServer")
+    String kafkaSinkServer;
+    @FormParam("kafkaSinkTopic")
+    String kafkaSinkTopic;
+
+    //redis sink
+    @FormParam("redisHost")
+    String redisHost;
+    @FormParam("redisDbNo")
+    String redisDbNo;
+    @FormParam("redisPort")
+    String redisPort;
+    @FormParam("redisKey")
+    String redisKey;
+
 
     public String getSourceType() {
         return sourceType;
@@ -207,5 +235,93 @@ public class JobModel {
 
     public void setMysqlSinkTable(String mysqlSinkTable) {
         this.mysqlSinkTable = mysqlSinkTable;
+    }
+
+    public String getKafkaSinkServer() {
+        return kafkaSinkServer;
+    }
+
+    public void setKafkaSinkServer(String kafkaSinkServer) {
+        this.kafkaSinkServer = kafkaSinkServer;
+    }
+
+    public String getKafkaSinkTopic() {
+        return kafkaSinkTopic;
+    }
+
+    public void setKafkaSinkTopic(String kafkaSinkTopic) {
+        this.kafkaSinkTopic = kafkaSinkTopic;
+    }
+
+    public String getRedisHost() {
+        return redisHost;
+    }
+
+    public void setRedisHost(String redisHost) {
+        this.redisHost = redisHost;
+    }
+
+    public String getRedisDbNo() {
+        return redisDbNo;
+    }
+
+    public void setRedisDbNo(String redisDbNo) {
+        this.redisDbNo = redisDbNo;
+    }
+
+    public String getRedisPort() {
+        return redisPort;
+    }
+
+    public void setRedisPort(String redisPort) {
+        this.redisPort = redisPort;
+    }
+
+    public String getRedisKey() {
+        return redisKey;
+    }
+
+    public void setRedisKey(String redisKey) {
+        this.redisKey = redisKey;
+    }
+
+    public String getMaster() {
+        return master;
+    }
+
+    public void setMaster(String master) {
+        this.master = master;
+    }
+
+    public String getDriverMemory() {
+        return driverMemory;
+    }
+
+    public void setDriverMemory(String driverMemory) {
+        this.driverMemory = driverMemory;
+    }
+
+    public String getExecutorMemory() {
+        return executorMemory;
+    }
+
+    public void setExecutorMemory(String executorMemory) {
+        this.executorMemory = executorMemory;
+    }
+
+    public String getExecutorCores() {
+        return executorCores;
+    }
+
+    public void setExecutorCores(String executorCores) {
+        this.executorCores = executorCores;
+    }
+
+    public String getNumExecutors() {
+        return numExecutors;
+    }
+
+    public void setNumExecutors(String numExecutors) {
+        this.numExecutors = numExecutors;
     }
 }

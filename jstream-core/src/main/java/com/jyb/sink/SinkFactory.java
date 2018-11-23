@@ -9,8 +9,12 @@ public class SinkFactory {
         Config sinkConfig = context.getConfiguration().getSinkConfig();
         if (sinkConfig instanceof ConsoleSink.ConsoleSinkConfig)
             return new ConsoleSink();
-        if (sinkConfig instanceof MysqlSink.MysqlSinkConfig)
+        else if (sinkConfig instanceof MysqlSink.MysqlSinkConfig)
             return new MysqlSink();
+        else if (sinkConfig instanceof RedisSink.RedisSinkConfig)
+            return new RedisSink();
+        else if (sinkConfig instanceof KafkaSink.KafkaSinkConfig)
+            return new KafkaSink();
         return null;
     }
 }

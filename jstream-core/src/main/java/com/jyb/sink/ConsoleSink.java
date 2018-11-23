@@ -20,30 +20,23 @@ import java.io.DataOutput;
 import java.io.IOException;
 import static java.util.Objects.*;
 
-public class ConsoleSink implements JstreamSink {
+public class ConsoleSink extends AbstractSink implements JstreamSink {
 
 
     @Override
-    public void writeToSink(Dataset<Row> df, JstreamContext context) {
+    public void writeToSink(String jobId,Dataset<Row> df, JstreamContext context) {
 
         ConsoleSinkConfig sinkConfig = (ConsoleSinkConfig)context.getConfiguration().getSinkConfig();
 
+        requireNonNull(context.getConfiguration().getExtConfig().getSparkCheckPointPath(),"checkpoint 不能为null,请检查jstream-env.sh");
         OutPutModeConfig outPutModeConfig = sinkConfig.getOutPutModeConfig();
         DataStreamWriter<Row> writer = df.writeStream().outputMode(outPutModeConfig.getMode())
                 .format("console")
                 .option("numRows", sinkConfig.getNumRows())
                 .option("truncate", sinkConfig.getTruncate());
-        if (StringUtils.isNotEmpty(sinkConfig.getTriggerConfig().getProcessTime())){
-            writer.trigger(Trigger.ProcessingTime(sinkConfig.getTriggerConfig().getProcessTime()));
-        }else if(StringUtils.isNotEmpty(sinkConfig.getTriggerConfig().getContinuosTime())){
-            writer.trigger(Trigger.Continuous(sinkConfig.getTriggerConfig().getContinuosTime()));
-        }
-        StreamingQuery streamingQuery =writer.start();
-        try {
-            streamingQuery.awaitTermination();
-        } catch (StreamingQueryException e) {
-            e.printStackTrace();
-        }
+
+        writeToSinkBase(writer, sinkConfig.getTriggerConfig().getProcessTime(), sinkConfig.getTriggerConfig().getContinuosTime(),
+                context.getConfiguration().getExtConfig().getSparkCheckPointPath());
     }
 
     public static class ConsoleSinkConfig implements Config, Writable {

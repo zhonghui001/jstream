@@ -172,7 +172,8 @@ public class JobImpl extends CompositeService implements Job {
     @Override
     public void startJob(String jobId) {
 
-        JobEvent runEvent = new StartJobEvent(jstreamConf, jobId);
+        JstreamConfiguration conf = jobStreamService.getJob(jobId).getConfiguration();
+        JobEvent runEvent = new StartJobEvent(jstreamConf, jobId,conf.getResouceConfig());
         getDispatcher(jobId).getEventHandler().handle(runEvent);
     }
 

@@ -13,6 +13,7 @@ import static java.util.Objects.*;
  */
 public class SqlEntry implements Serializable, Writable {
 
+    private static final long serialVersionUID = -8316883546379762446L;
     String sql="";
     String alias="";
 

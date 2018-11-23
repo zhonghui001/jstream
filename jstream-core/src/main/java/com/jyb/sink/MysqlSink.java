@@ -5,48 +5,40 @@ import com.jyb.config.JstreamContext;
 import com.jyb.config.OutPutModeConfig;
 import com.jyb.config.TriggerConfig;
 import com.jyb.sink.writer.JdbcForeachWriter;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.streaming.DataStreamWriter;
-import org.apache.spark.sql.streaming.StreamingQuery;
-import org.apache.spark.sql.streaming.StreamingQueryException;
-import org.apache.spark.sql.streaming.Trigger;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-import static java.util.Objects.*;
+import static java.util.Objects.requireNonNull;
 
-public class MysqlSink implements JstreamSink {
+public class MysqlSink extends AbstractSink implements JstreamSink {
 
     @Override
-    public void writeToSink(Dataset<Row> df, JstreamContext context) {
+    public void writeToSink(String jobId,Dataset<Row> df, JstreamContext context) {
         MysqlSinkConfig sinkConfig = (MysqlSinkConfig)context.getConfiguration().getSinkConfig();
+
+        requireNonNull(context.getConfiguration().getExtConfig().getSparkCheckPointPath(),"checkpoint 不能为null,请检查jstream-env.sh");
 
         OutPutModeConfig outPutModeConfig = sinkConfig.getOutPutModeConfig();
         DataStreamWriter<Row> writer = df.writeStream().outputMode(outPutModeConfig.getMode())
                 .foreach(new JdbcForeachWriter(sinkConfig.getFullUrl(),sinkConfig.getUserName(),sinkConfig.getPassword(),sinkConfig.getTable()));
 
-        if (StringUtils.isNotEmpty(sinkConfig.getTriggerConfig().getProcessTime())){
-            writer.trigger(Trigger.ProcessingTime(sinkConfig.getTriggerConfig().getProcessTime()));
-        }else if(StringUtils.isNotEmpty(sinkConfig.getTriggerConfig().getContinuosTime())){
-            writer.trigger(Trigger.Continuous(sinkConfig.getTriggerConfig().getContinuosTime()));
-        }
-        StreamingQuery streamingQuery =writer.start();
-        try {
-            streamingQuery.awaitTermination();
-        } catch (StreamingQueryException e) {
-            e.printStackTrace();
-        }
+        super.writeToSinkBase(writer,sinkConfig.getTriggerConfig().getProcessTime(),
+                sinkConfig.getTriggerConfig().getContinuosTime(),context.getConfiguration().getExtConfig().getSparkCheckPointPath());
 
     }
 
 
     public static class MysqlSinkConfig implements Config, Writable {
+
+
+        private static final long serialVersionUID = 5322425870670043910L;
         String url;
         String userName;
         String password;

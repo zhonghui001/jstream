@@ -18,6 +18,10 @@ import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.jar.JarOutputStream;
 
+/**
+ * 测试用
+ * 废弃
+ */
 public class JstreamRpcClient {
 
     public void call()throws Exception{

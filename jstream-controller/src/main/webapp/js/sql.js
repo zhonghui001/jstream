@@ -6,13 +6,30 @@ $(function (){
         if (sinkType=='console'){
             $(".console").show();
             $(".mysql").hide();
+            $(".redis").hide();
+            $(".kafka").hide();
         }else if(sinkType=='mysql'){
-            $('.console').hide();
+            $(".console").hide();
             $(".mysql").show();
+            $(".redis").hide();
+            $(".kafka").hide();
+        }else if(sinkType=='redis'){
+            $(".console").hide();
+            $(".mysql").hide();
+            $(".redis").show();
+            $(".kafka").hide();
+        }else if(sinkType=='kafka'){
+            $(".console").hide();
+            $(".mysql").hide();
+            $(".redis").hide();
+            $(".kafka").show();
         }else{
             $(".error li").html(sinkType+"暂时不支持，请关注后续版本");
             $(".notice").html($(".error").html());
             $(".console").hide();
+            $(".mysql").hide();
+            $(".redis").hide();
+            $(".kafka").hide();
         }
     })
 

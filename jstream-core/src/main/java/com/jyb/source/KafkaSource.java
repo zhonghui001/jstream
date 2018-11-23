@@ -26,7 +26,8 @@ public class KafkaSource implements JstreamSource, Writable {
                 .option("failOnDataLoss", "false")
                 .option("group.id",source.getGroupId())
                 .option("auto.offset.reset",source.getOffsetMode())
-                .load().selectExpr("CAST(value AS STRING)");
+                .load().selectExpr("CAST(value AS STRING)")
+                .dropDuplicates();
         return df;
     }
 
@@ -44,6 +45,7 @@ public class KafkaSource implements JstreamSource, Writable {
     @Name("kafka")
     public static class KafkaSouceConfig implements Config,Writable{
 
+        private static final long serialVersionUID = -618964413542989195L;
         private String server;
 
         private String topic;

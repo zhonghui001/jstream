@@ -20,9 +20,11 @@ public class JstreamConf {
     String sparkHome;
     String hadoopHome;
 
+
     public String getJdbcType() {
         return jdbcType;
     }
+
 
     @Config("jdbc.type")
     public void setJdbcType(String jdbcType) {

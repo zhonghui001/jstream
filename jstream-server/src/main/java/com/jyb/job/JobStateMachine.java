@@ -142,7 +142,7 @@ public class JobStateMachine implements EventHandler<JobEvent> {
             String extPathPath = getExtJarPath(startJobEvent);
             //2.提交jar包和配置文件，推送到yarn集群中
             JobConf jobConf = new JobConf(sparkJarPath+","+extPathPath,
-                    startJobEvent.getJobId());
+                    startJobEvent.getJobId(),startJobEvent.getResouceConfig());
             try {
                 System.out.println(jobConf.getCommandLine());
                 new Thread(()->{

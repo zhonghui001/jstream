@@ -16,6 +16,8 @@ import static java.util.Objects.requireNonNull;
 public class JstreamConfiguration implements Serializable, Writable {
 
 
+    private static final long serialVersionUID = 7836737459382017737L;
+
     //资源类配置
     private ResouceConfig resouceConfig;
 

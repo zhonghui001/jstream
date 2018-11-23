@@ -63,6 +63,8 @@ public class JdbcForeachWriter extends AbstractWritter implements Serializable {
                 sb.append(null+",");
             }else if(sf.dataType() instanceof StringType){
                 sb.append("'"+row.getString(i++)+"',");
+            }else if (sf.dataType() instanceof TimestampType){
+                sb.append("'"+row.getTimestamp(i++)+',');
             }
         }
 

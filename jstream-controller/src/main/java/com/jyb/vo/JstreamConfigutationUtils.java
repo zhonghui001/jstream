@@ -2,7 +2,9 @@ package com.jyb.vo;
 
 import com.jyb.config.*;
 import com.jyb.sink.ConsoleSink;
+import com.jyb.sink.KafkaSink;
 import com.jyb.sink.MysqlSink;
+import com.jyb.sink.RedisSink;
 import com.jyb.source.KafkaSource;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,7 +14,15 @@ public class JstreamConfigutationUtils {
 
     public static JobModel parse(JstreamConfiguration conf){
         JobModel jobModel = new JobModel();
+        //extconfig
         jobModel.setAppName(conf.getExtConfig().getAppName());
+        //resouceconfig
+        ResouceConfig resouceConfig = conf.getResouceConfig();
+        jobModel.setMaster(resouceConfig.getMaster());
+        jobModel.setDriverMemory(resouceConfig.getDriverMemory());
+        jobModel.setExecutorCores(resouceConfig.getExecutorCores());
+        jobModel.setExecutorMemory(resouceConfig.getExecutorMemory());
+        jobModel.setNumExecutors(resouceConfig.getNumExecutors());
 
         //source
         if (conf.getSourceConfig() instanceof KafkaSource.KafkaSouceConfig){
@@ -48,6 +58,29 @@ public class JstreamConfigutationUtils {
             jobModel.setMysqlSinkTable(sinkConfig.getTable());
             jobModel.setMysqlSinkDbName(sinkConfig.getDbName());
 
+        }else if (conf.getSinkConfig() instanceof RedisSink.RedisSinkConfig){
+            RedisSink.RedisSinkConfig sinkConfig = (RedisSink.RedisSinkConfig) conf.getSinkConfig();
+            jobModel.setOutPutMode(sinkConfig.getOutPutModeConfig().getMode());
+            jobModel.setProcessInterval(sinkConfig.getTriggerConfig().getProcessTime());
+            jobModel.setSinkType("redis");
+
+            jobModel.setRedisDbNo(String.valueOf(sinkConfig.getDbNo()));
+            jobModel.setRedisHost(String.valueOf(sinkConfig.getHost()));
+            jobModel.setRedisPort(String.valueOf(sinkConfig.getPort()));
+            jobModel.setRedisKey(String.valueOf(sinkConfig.getRedisKey()));
+
+
+
+        }else if(conf.getSinkConfig() instanceof KafkaSink.KafkaSinkConfig){
+            KafkaSink.KafkaSinkConfig sinkConfig = (KafkaSink.KafkaSinkConfig) conf.getSinkConfig();
+            jobModel.setOutPutMode(sinkConfig.getOutPutModeConfig().getMode());
+            jobModel.setProcessInterval(sinkConfig.getTriggerConfig().getProcessTime());
+
+            jobModel.setKafkaSinkServer(sinkConfig.getServer());
+            jobModel.setKafkaSinkTopic(sinkConfig.getTopic());
+            jobModel.setSinkType("kafka");
+        }else{
+            throw new RuntimeException("不支持类型");
         }
 
         return jobModel;
@@ -58,6 +91,11 @@ public class JstreamConfigutationUtils {
         JstreamConfiguration configuration = new JstreamConfiguration();
 
         ResouceConfig resouceConfig = new ResouceConfig();
+        resouceConfig.setDriverMemory(jobModel.getDriverMemory());
+        resouceConfig.setExecutorCores(jobModel.getExecutorCores());
+        resouceConfig.setExecutorMemory(jobModel.getExecutorMemory());
+        resouceConfig.setMaster(jobModel.getMaster());
+        resouceConfig.setNumExecutors(jobModel.getNumExecutors());
         configuration.setResouceConfig(resouceConfig);
 
         ExtConfig extConfig = new ExtConfig(jobModel.getAppName());
@@ -107,7 +145,28 @@ public class JstreamConfigutationUtils {
             sinkConfig.setTriggerConfig(triggerConfig);
             sinkConfig.setOutPutModeConfig(new OutPutModeConfig(jobModel.getOutPutMode()));
             configuration.setSinkConfig(sinkConfig);
-        }else{
+        }else if(StringUtils.equals(jobModel.getSinkType(),"redis")){
+            RedisSink.RedisSinkConfig sinkConfig = new RedisSink.RedisSinkConfig();
+            sinkConfig.setDbNo(Integer.parseInt(jobModel.getRedisDbNo()));
+            sinkConfig.setHost(jobModel.getRedisHost());
+            sinkConfig.setPort(Integer.parseInt(jobModel.getRedisPort()));
+            sinkConfig.setRedisKey(jobModel.getRedisKey());
+
+            TriggerConfig triggerConfig = new TriggerConfig(jobModel.getProcessInterval(),jobModel.getContinuosInterval());
+            sinkConfig.setTriggerConfig(triggerConfig);
+            sinkConfig.setOutPutModeConfig(new OutPutModeConfig(jobModel.getOutPutMode()));
+            configuration.setSinkConfig(sinkConfig);
+
+        }else if(StringUtils.equals(jobModel.getSinkType(),"kafka")){
+            KafkaSink.KafkaSinkConfig sinkConfig = new KafkaSink.KafkaSinkConfig();
+            sinkConfig.setServer(jobModel.getKafkaSinkServer());
+            sinkConfig.setTopic(jobModel.getKafkaSinkTopic());
+
+            TriggerConfig triggerConfig = new TriggerConfig(jobModel.getProcessInterval(),jobModel.getContinuosInterval());
+            sinkConfig.setTriggerConfig(triggerConfig);
+            sinkConfig.setOutPutModeConfig(new OutPutModeConfig(jobModel.getOutPutMode()));
+            configuration.setSinkConfig(sinkConfig);
+        } else{
             throw new RuntimeException("不支持sink类型");
         }
 

@@ -62,7 +62,6 @@ public class JstreamServer extends CompositeService {
     }
 
     public static void main(String[] args) {
-        //System.setProperty("config","src/main/conf/jsteam.properties");
         ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(new ServerModule(),
                 new JsonModule()

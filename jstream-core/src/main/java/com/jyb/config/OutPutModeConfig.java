@@ -6,6 +6,7 @@ import java.io.IOException;
 
 public class OutPutModeConfig implements Config {
 
+    private static final long serialVersionUID = 1357049996766276796L;
     private String mode = "append";
 
     public OutPutModeConfig(){}

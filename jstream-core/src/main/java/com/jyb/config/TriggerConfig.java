@@ -9,6 +9,7 @@ import java.io.IOException;
 
 public class TriggerConfig implements Config, Writable {
 
+    private static final long serialVersionUID = -6015514211413312319L;
     String processTime="";
     String continuosTime="";
 

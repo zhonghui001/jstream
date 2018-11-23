@@ -7,7 +7,7 @@ import org.apache.spark.sql.Row;
 public interface JstreamSink {
 
 
-    public void writeToSink(Dataset<Row> df, JstreamContext context);
+    public void writeToSink(String jobId,Dataset<Row> df, JstreamContext context);
 
 
 }

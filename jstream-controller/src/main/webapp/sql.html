@@ -59,7 +59,6 @@
                 <div class="col-md-12 breadcrumb"><strong >ext config</strong></div>
             </div>
             <div class="row ">
-
                 <div class="col-md-6">
                     <label class="col-md-4 control-label text-right">app名称</label>
                     <div class="col-md-8">
@@ -68,9 +67,46 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-
+                    <label class="col-md-4 control-label text-right">master</label>
+                    <div class="col-md-8">
+                        <select class="form-control" name="master">
+                            <option>yarn-cluster</option>
+                            <option>yarn-client</option>
+                        </select>
+                    </div>
                 </div>
             </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">driver-memory</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="" name="driverMemory" value="1G">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">executor-memory</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="" name="executorMemory" value="2G">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row ">
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">driver-cores</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="" name="executorCores" value="2">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="col-md-4 control-label text-right">num-executor</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control" placeholder="" name="numExecutors" value="2">
+                    </div>
+                </div>
+            </div>
+
         </div>
         <!-- ext config end -->
 
@@ -196,9 +232,11 @@
                         <select class="form-control " name="sinkType" id="sinkType">
                             <option>console</option>
                             <option>kafka</option>
+                            <option>redis</option>
                             <option>mysql</option>
                             <option>hbase</option>
                             <option>es</option>
+
                         </select>
                     </div>
                 </div>
@@ -288,9 +326,84 @@
                 </div>
             </div>
 
+            <!-- kafka sink -->
+            <div class="container kafka collapse">
+                <div class="row">
+                    <div class="row ">
+                        <div class="col-md-12 text-muted"><strong >kafka sink</strong></div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">kafka server</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="如：10.23.181.177:9092,0.23.107.174:9092"
+                                       name="kafkaSinkServer" value="10.23.181.177:9092,0.23.107.174:9092">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">topic
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="topic"
+                                       name="kafkaSinkTopic" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- redis sink -->
+            <div class="container redis collapse">
+                <div class="row">
+                    <div class="row ">
+                        <div class="col-md-12 text-muted"><strong >redis sink</strong></div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">host</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="10.23.14.7"
+                                       name="redisHost" value="">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">dbNo
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="dbNo,默认为0"
+                                       name="redisDbNo" value="1" >
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row ">
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">port</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="6379"
+                                       name="redisPort" value="6379">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="col-md-4 control-label text-right">key name
+                            </label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" placeholder="如：bi:h:appname"
+                                       name="redisKey" value="bi:h:appname" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
         <!-- sink end -->
+
+
+
 
         <!-- 按钮 -->
         <div class="container bottom-btn ">
