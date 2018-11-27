@@ -49,9 +49,9 @@ $(function (){
                     '<div class="row">' +
                     '<div class="col-md-1">' + jobId + '</div>' +
                     '<div class="col-md-1">' + appName + '</div>' +
-                    '<div class="col-md-2">' + jobState + '</div>' +
+                    '<div class="col-md-1">' + jobState + '</div>' +
 
-                    '<div class="col-md-2">' + applicationId + '</div>' +
+                    '<div class="col-md-3">' + applicationId + '</div>' +
                     '<div class="col-md-1">' + status + '</div>' +
                     '<div class="col-md-4" jobId="' + jobId + '">' + button + '</div>' +
                     '</div>';

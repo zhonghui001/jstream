@@ -19,8 +19,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
@@ -33,40 +31,43 @@ public class JStreamMain {
     public static void main(String[] args) {
         requireNonNull(args[0], "参数不能为null");
         requireNonNull(args[1], "参数不能为null");
-        JstreamConfiguration conf = getJstreamConfiguration(args[0], args[1]);
+        Properties properties = loadProperties(args[1]);
+        requireNonNull(properties,"spark-submit args[1] 路径有问题，请查询");
+
+        JstreamConfiguration conf = getJstreamConfiguration(args[0],properties);
         requireNonNull(conf, "JstreamConfiguration 不能为null");
+
         JstreamContext jstreamContext = new JstreamContext(conf);
         JStreamMain main = new JStreamMain(jstreamContext);
-        main.execute(args[0], args[1]);
+        main.execute(args[0], properties);
     }
 
-    private static JstreamConfiguration getJstreamConfiguration(String jobId, String propertiesPath) {
-        try {
-            String sql = "select * from t_jstream_job where id=?";
-            String path = propertiesPath;
-            Configuration conf = new Configuration();
-            FileSystem fs = FileSystem.get(conf);
-            FSDataInputStream in = fs.open(new Path(path));
-            Properties properties = new Properties();
-            properties.load(in);
-            String url = properties.get("jdbc.url").toString();
-            String username = properties.get("jdbc.username").toString();
-            String password = properties.get("jdbc.password").toString();
-            JobVo job = MysqlUtils.getJob(url, username, password, sql,
-                    Integer.parseInt(jobId.replace("JSTREAM_JOB_", "")));
-            if (job == null) {
-                throw new RuntimeException("jobid 为 " + jobId + " 在数据库中不存在");
-            }
+    private static Properties loadProperties(String propertiesPath){
+      try{
+          Configuration conf = new Configuration();
+          FileSystem fs = FileSystem.get(conf);
+          FSDataInputStream in = fs.open(new Path(propertiesPath));
+          Properties properties = new Properties();
+          properties.load(in);
+          return properties;
+      }catch (Exception ex){
+          ex.printStackTrace();
+      }
+      return null;
+    }
 
-
-            return job.getConfiguration();
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
+    private static JstreamConfiguration getJstreamConfiguration(String jobId, Properties properties) {
+        String sql = "select * from t_jstream_job where id=?";
+        String url = properties.get("jdbc.url").toString();
+        String username = properties.get("jdbc.username").toString();
+        String password = properties.get("jdbc.password").toString();
+        JobVo job = MysqlUtils.getJob(url, username, password, sql,
+                Integer.parseInt(jobId.replace("JSTREAM_JOB_", "")));
+        if (job == null) {
+            throw new RuntimeException("jobid 为 " + jobId + " 在数据库中不存在");
         }
 
-        return null;
+        return job.getConfiguration();
 
     }
 
@@ -78,16 +79,25 @@ public class JStreamMain {
     private JstreamContext context;
 
 
-    public void execute(String jobId, String propertiesPath) {
+    public void execute(String jobId, Properties properties) {
         JstreamConfiguration conf = context.getConfiguration();
         //设置checkpoint 路径
         ExtConfig extConfig = conf.getExtConfig();
         extConfig.setSparkCheckPointPath(extConfig.getSparkCheckPointPath()+"/"+jobId);
         SparkSession spark = SparkSession.builder().appName(jobId).enableHiveSupport().getOrCreate();
 
+        //监控
+        spark.streams().addListener(new QueryLinstener());
+
+        String applicationId = spark.sparkContext().applicationId();
+        requireNonNull(applicationId,"applicationId 不能为null");
+        updateApplicationId(jobId, applicationId, properties);
+
         //获取df
         JstreamSource source = SourceFactory.getSource(context);
         Dataset<Row> sdf = source.createStream(spark, context);
+
+
 
         //注册表
         sdf.createOrReplaceTempView("topic");
@@ -97,33 +107,24 @@ public class JStreamMain {
         requireNonNull(dfAfterSql, "sql list最后一个sql不能带别名");
 
 
-        String applicationId = spark.sparkContext().applicationId();
-        updateApplicationId(jobId, applicationId, propertiesPath);
+
 
         //执行sink
         JstreamSink sink = SinkFactory.getSink(context);
         sink.writeToSink(jobId, dfAfterSql, context);
 
 
+
     }
 
-    private void updateApplicationId(String jobId, String applicationId, String propertiesPath) {
+    private void updateApplicationId(String jobId, String applicationId,Properties properties) {
         String sql = "update t_jstream_job set applicationId=? where id=?";
-        try {
-            Configuration conf = new Configuration();
-            FileSystem fs = FileSystem.get(conf);
-            FSDataInputStream in = fs.open(new Path(propertiesPath));
-            Properties properties = new Properties();
-            properties.load(in);
-
-            String url = properties.get("jdbc.url").toString();
-            String username = properties.get("jdbc.username").toString();
-            String password = properties.get("jdbc.password").toString();
-            MysqlUtils.executeQuery(url, username, password, sql, applicationId,
-                    Integer.parseInt(jobId.replace("JSTREAM_JOB_", "")));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        String url = properties.get("jdbc.url").toString();
+        String username = properties.get("jdbc.username").toString();
+        String password = properties.get("jdbc.password").toString();
+        System.out.println("更新mysql");
+        MysqlUtils.executeQuery(url, username, password, sql, applicationId,
+                Integer.parseInt(jobId.replace("JSTREAM_JOB_", "")));
     }
 
     private Dataset<Row> doSql(SparkSession spark, List<SqlEntry> sqlEntryList) {
