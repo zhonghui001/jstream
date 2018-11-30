@@ -65,6 +65,7 @@ public class JobConf {
                 " --executor-cores "+resourceConfig.getExecutorCores()+
                 " --num-executors "+ resourceConfig.getNumExecutors()+
                 " --jars " + jarPath +
+                " --conf 'spark.executor.extraJavaOptions=-XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/data/jstream.dump.bin' "+
                 //" --files " + jstreamHome + "/conf/jstream.properties " +
                 " --class " + "com.jyb.core.JStreamMain " +
                 //" --conf JSTREAM_HOME="+jstreamHome+" "+

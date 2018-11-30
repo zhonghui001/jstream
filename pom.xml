@@ -14,6 +14,7 @@
         <module>jstream-Distribution</module>
         <module>jstream-spark</module>
         <module>jstream-server</module>
+        <module>jstream-parser</module>
     </modules>
 
 

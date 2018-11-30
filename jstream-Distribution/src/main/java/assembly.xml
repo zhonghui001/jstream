@@ -17,6 +17,7 @@
                 <include>com.jyb.stream:jstream-controller</include>
                 <include>com.jyb.stream:jstream-core</include>
                 <include>com.jyb.stream:jstream-server</include>
+                <include>com.jyb.stream:jstream-parser</include>
             </includes>
             <binaries>
                 <outputDirectory>lib</outputDirectory>

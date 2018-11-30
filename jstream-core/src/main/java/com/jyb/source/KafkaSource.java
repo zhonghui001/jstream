@@ -26,8 +26,8 @@ public class KafkaSource implements JstreamSource, Writable {
                 .option("failOnDataLoss", "false")
                 .option("group.id",source.getGroupId())
                 .option("auto.offset.reset",source.getOffsetMode())
-                .load().selectExpr("CAST(value AS STRING)")
-                .dropDuplicates();
+                .load().selectExpr("CAST(value AS STRING)");
+                //.dropDuplicates();
         return df;
     }
 
