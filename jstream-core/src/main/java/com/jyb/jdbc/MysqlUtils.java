@@ -86,6 +86,7 @@ public class MysqlUtils {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
+                        jobVo.setSqlStr(resultSet.getString(8)==null?"":resultSet.getString(8));
                         jobVos.add(jobVo);
 
 

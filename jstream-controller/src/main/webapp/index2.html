@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>jobmanager</title>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 10px 50px;
+            font-size: 16px;
+        }
+        .row {
+            line-height: 40px;
+            margin-left: 20px;
+        }
+        button {
+            margin: 0 10px
+        }
+        button a{
+            color:#fff;
+        }
+        h2 {
+            border-bottom: 1px solid #ccc;
+            height: 50px;
+            text-align: center
+        }
+    </style>
+    <script src="js/jquery.min.js"></script>
+    <!-- 加载 Bootstrap 的所有 JavaScript 插件。你也可以根据需要只加载单个插件。 -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/list2.js"></script>
+</head>
+<body>
+
+
+
+<h2>JobManager</h2>
+<div class="container">
+    <div class="row">
+        <div class="col-md-7"><label>job列表</label></div>
+        <div class="col-md-5">
+            <button class="btn btn-primary" onclick='window.location.href="index2.html"'>刷新</button>
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newStream" id="add">
+                新建
+            </button>
+        </div>
+    </div>
+
+    <div class="row" id="rowHead">
+        <div class="col-md-1">任务id</div>
+        <div class="col-md-1">app名称</div>
+        <div class="col-md-1">任务状态</div>
+
+        <div class="col-md-3">yarnId</div>
+        <div class="col-md-1">yarnState</div>
+        <div class="col-md-4">操作</div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade bs-example-modal-lg" id="newStream" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <form  id="aform">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">新建</h4>
+                </div>
+                <div class="modal-body">
+                    <textarea rows="12" wrap="hard" class="form-control" cols="140" name="sql" id="sql">
+--定义资源,appname;
+with resources(app_name='myfirstapp',resource_master='yarn-cluster',resource_driver_memory='2g',resource_executor_memory='2g',resource_driver_cores='2',resource_num_executor='2');
+--定义源table 类型为kafka value是内置字段，类型暂时不生效;
+create source table topic1( value varchar) with( type = 'kafka',source_kafka_server='10.23.61.192:9092,10.23.215.68:9092,10.23.61.192:9092,10.23.215.68:9092',source_kafka_topic='dbjyb');
+--定义输出表，类型为kafka，value是内置字段;
+create sink table sink1(value varchar) with(type='kafka',sink_kafka_server='10.23.61.192:9092,10.23.215.68:9092,10.23.61.192:9092,10.23.215.68:9092',sink_kafka_topic='test');
+--执行sql 将结果重新定义为一个流失表topic2;
+with topic2 as(select * from topic1 );
+--执行写入sink table操作;
+with (out_mode='append') insert into sink1 select count(1) co from topic2
+                    </textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    <button type="button" class="btn btn-primary save">保存</button>
+                </div>
+                <input id="id" name="id" type="hidden">
+            </div>
+        </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+</html>

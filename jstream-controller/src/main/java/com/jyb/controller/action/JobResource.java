@@ -7,6 +7,7 @@ import com.jyb.job.Job;
 import com.jyb.job.vo.JobVo;
 import com.jyb.job.vo.JobVoList;
 import com.jyb.vo.JobModel;
+import com.jyb.vo.JobModelV2;
 import com.jyb.vo.JstreamConfigutationUtils;
 import jdk.nashorn.internal.objects.annotations.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -40,15 +41,15 @@ public class JobResource {
     @Path("save")
     @Produces({MediaType.APPLICATION_JSON})
     public Map save(@Context HttpServletRequest request,
-                   @BeanParam JobModel jobModel
-                    ){
+                    @BeanParam JobModel jobModel
+    ){
         try{
             requireNonNull(jobModel,"save post信息为null");
             JstreamConfiguration configuration = JstreamConfigutationUtils.convert(jobModel);
             if (StringUtils.isNotEmpty(jobModel.getId())){
-                job.updateJob(configuration,JOB_PIRFIX+jobModel.getId());
+                job.updateJob(configuration,JOB_PIRFIX+jobModel.getId(),"");
             }else{
-                job.saveJob(configuration);
+                job.saveJob(configuration,"");
             }
 
             return ImmutableMap.of("data","sucess");
@@ -63,14 +64,14 @@ public class JobResource {
     @Path("list")
     @Produces({MediaType.APPLICATION_JSON})
     public Map list(){
-       try{
-           JobVoList jobVoList = job.listJobs();
-           List<JobVo> jobVos = jobVoList.getJobVos();
-           return ImmutableMap.of("data",jobVos);
-       }catch (Exception ex){
-           ex.printStackTrace();
-           return ImmutableMap.of("data",ex.getMessage());
-       }
+        try{
+            JobVoList jobVoList = job.listJobs();
+            List<JobVo> jobVos = jobVoList.getJobVos();
+            return ImmutableMap.of("data",jobVos);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ImmutableMap.of("data",ex.getMessage());
+        }
     }
 
     @GET
@@ -130,6 +131,42 @@ public class JobResource {
             ex.printStackTrace();
             return ImmutableMap.of("data",ex.getMessage());
         }
+    }
+
+    @POST
+    @Consumes("application/x-www-form-urlencoded")
+    @Path("saveOrUpdate")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Map saveOrUpdate(@BeanParam JobModelV2 jobModel){
+        try{
+            requireNonNull(jobModel,"save post信息为null");
+            requireNonNull(jobModel.getSql(),"save sql信息为null");
+            if (StringUtils.isNotEmpty(jobModel.getId())){
+                job.updateJob(JOB_PIRFIX+jobModel.getId(),jobModel.getSql());
+            }else{
+                job.saveJob(jobModel.getSql());
+            }
+            return ImmutableMap.of("data","sucess");
+        }catch (Exception ex){
+            return ImmutableMap.of("data", ex.getCause().getMessage());
+        }
+    }
+
+
+    @GET
+    @Path("getJobV2")
+    @Produces({MediaType.APPLICATION_JSON})
+    public Map getJobV2(@QueryParam("jobId") String id){
+
+        try{
+            JobVo job = this.job.getJob(JOB_PIRFIX + id);
+            //return ImmutableMap.of("data",model);
+            return ImmutableMap.of("data",job);
+        }catch (Exception ex){
+            ex.printStackTrace();
+            return ImmutableMap.of("data",ex.getMessage());
+        }
+
 
     }
 

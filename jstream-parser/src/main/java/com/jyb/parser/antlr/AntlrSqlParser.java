@@ -18,6 +18,7 @@ package com.jyb.parser.antlr;
 import com.jyb.SqlBaseLexer;
 import com.jyb.SqlBaseParser;
 
+import com.jyb.exception.SqlParseException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.PredictionMode;
 import org.antlr.v4.runtime.misc.ParseCancellationException;
@@ -39,7 +40,11 @@ public class AntlrSqlParser
 
     public Statement createStatement(String sql)
     {
-        return (Statement) invokeParser("statement", sql, SqlBaseParser::singleStatement);
+        try{
+            return (Statement) invokeParser("statement", sql, SqlBaseParser::singleStatement);
+        }catch (Exception ex){
+            throw new SqlParseException(sql+"  "+ex.getMessage(),ex);
+        }
     }
 
     private Node invokeParser(String name, String sql, Function<SqlBaseParser, ParserRuleContext> parseFunction)

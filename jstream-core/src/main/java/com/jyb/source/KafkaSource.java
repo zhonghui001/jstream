@@ -1,9 +1,6 @@
 package com.jyb.source;
 
-import com.jyb.config.Config;
-import com.jyb.config.JstreamConfiguration;
-import com.jyb.config.JstreamContext;
-import com.jyb.config.Name;
+import com.jyb.config.*;
 import org.apache.hadoop.io.Writable;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
@@ -27,6 +24,7 @@ public class KafkaSource implements JstreamSource, Writable {
                 .option("group.id",source.getGroupId())
                 .option("auto.offset.reset",source.getOffsetMode())
                 .load().selectExpr("CAST(value AS STRING)");
+        df.registerTempTable(source.getAlias());
                 //.dropDuplicates();
         return df;
     }
@@ -42,25 +40,35 @@ public class KafkaSource implements JstreamSource, Writable {
     }
 
 
-    @Name("kafka")
+    @Name("kafkaSource")
     public static class KafkaSouceConfig implements Config,Writable{
 
         private static final long serialVersionUID = -618964413542989195L;
+
+        @NotNull()
+        @Name("source.kafka.server")
         private String server;
 
+        @NotNull
+        @Name("source.kafka.topic")
         private String topic;
 
-        private String groupId;
+        @Name("source.kafka.groupId")
+        private String groupId="";
 
+        @Name("source.kafka.offsetMode")
         private String offsetMode="latest";
+
+        private String alias="topic";
 
         public KafkaSouceConfig(){}
 
-        public KafkaSouceConfig(String server, String topic, String groupId, String offsetMode) {
+        public KafkaSouceConfig(String server, String topic, String groupId, String offsetMode,String alias) {
             this.server = server;
-            this.topic = topic;
-            this.groupId = groupId;
-            this.offsetMode = offsetMode;
+            this.topic = topic==null?"":topic;
+            this.groupId = groupId==null?"":groupId;
+            this.offsetMode = offsetMode == null?"":offsetMode;
+            this.alias = alias==null?"topic":alias;
         }
 
         public String getServer() {
@@ -95,12 +103,21 @@ public class KafkaSource implements JstreamSource, Writable {
             this.offsetMode = offsetMode;
         }
 
+        public String getAlias() {
+            return alias;
+        }
+
+        public void setAlias(String alias) {
+            this.alias = alias;
+        }
+
         @Override
         public void write(DataOutput out) throws IOException {
             out.writeUTF(server);
             out.writeUTF(topic);
             out.writeUTF(groupId);
             out.writeUTF(offsetMode);
+            out.writeUTF(alias==null?"topic":alias);
         }
 
         @Override
@@ -109,6 +126,7 @@ public class KafkaSource implements JstreamSource, Writable {
             this.topic = in.readUTF();
             this.groupId = in.readUTF();
             this.offsetMode = in.readUTF();
+            this.alias = in.readUTF();
 
         }
     }

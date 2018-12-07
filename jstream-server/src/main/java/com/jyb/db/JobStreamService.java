@@ -25,16 +25,19 @@ public class JobStreamService {
 
 
     public String saveJob(JobVo jobvo){
-        String sql="insert into t_jstream_job (configuration,jobState,appName) values(?,?,?)";
+        String sql="insert into t_jstream_job (configuration,jobState,appName,sqlStr) values(?,?,?,?)";
         Integer id = MysqlUtils.insert(jstreamConf, sql, jobvo.getConfiguration(),
-                JobStateMachine.JobStateInternal.NEW.toString(),jobvo.getConfiguration().getExtConfig().getAppName());
+                JobStateMachine.JobStateInternal.NEW.toString(),
+                jobvo.getConfiguration().getExtConfig().getAppName(),
+                jobvo.getSqlStr());
         return "JSTREAM_JOB_"+id;
     }
 
-    public void updateJobConfiguration(JstreamConfiguration jstreamConfiguration, String jobId){
-        String sql = "update t_jstream_job set configuration=? ,appName=? where id=? ";
+    public void updateJobConfiguration(JstreamConfiguration jstreamConfiguration, String jobId,String sqlStr){
+        String sql = "update t_jstream_job set configuration=? ,appName=?,sqlStr=? where id=? ";
         MysqlUtils.executeQuery(jstreamConf,sql,jstreamConfiguration,
                 jstreamConfiguration.getExtConfig().getAppName(),
+                sqlStr,
                 Integer.parseInt(jobId.replace(JOB_PIRFIX,"")));
     }
 

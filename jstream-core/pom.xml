@@ -381,6 +381,11 @@
             <artifactId>antlr4-runtime</artifactId>
             <version>4.7.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.11</version>
+        </dependency>
 
         <!--<dependency>-->
         <!--<groupId>com.sun.jersey</groupId>-->

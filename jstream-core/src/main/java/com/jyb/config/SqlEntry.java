@@ -1,5 +1,6 @@
 package com.jyb.config;
 
+import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 
 import java.io.DataInput;
@@ -17,12 +18,15 @@ public class SqlEntry implements Serializable, Writable {
     String sql="";
     String alias="";
 
+    WaterMarkConfig waterMark;
+
     public SqlEntry() {
     }
 
-    public SqlEntry(String sql, String alias) {
+    public SqlEntry(String sql, String alias,WaterMarkConfig waterMark) {
         this.sql = requireNonNull(sql,"sql不能为null");
-        this.alias = requireNonNull(alias,"alias不能为努力了,可以用‘’代替");
+        this.alias = requireNonNull(alias,"alias不能为null了,可以用‘’代替");
+        this.waterMark = waterMark==null?new WaterMarkConfig():waterMark;
     }
 
     public String getSql() {
@@ -41,15 +45,25 @@ public class SqlEntry implements Serializable, Writable {
         this.alias = alias;
     }
 
+    public WaterMarkConfig getWaterMark() {
+        return waterMark;
+    }
+
+    public void setWaterMark(WaterMarkConfig waterMark) {
+        this.waterMark = waterMark;
+    }
+
     @Override
     public void write(DataOutput out) throws IOException {
         out.writeUTF(sql);
         out.writeUTF(alias);
+        ObjectWritable.writeObject(out,waterMark,waterMark.getClass(),null);
     }
 
     @Override
     public void readFields(DataInput in) throws IOException {
         sql = in.readUTF();
         alias = in.readUTF();
+        waterMark=(WaterMarkConfig) ObjectWritable.readObject(in,null);
     }
 }

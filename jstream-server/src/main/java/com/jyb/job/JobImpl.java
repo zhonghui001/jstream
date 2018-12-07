@@ -1,12 +1,11 @@
 package com.jyb.job;
 
-import com.google.common.cache.LoadingCache;
 import com.jyb.config.JstreamConfiguration;
+import com.jyb.core.StatementParser;
 import com.jyb.db.JobStreamService;
 import com.jyb.job.vo.JobVo;
 import com.jyb.job.vo.JobVoList;
 import com.jyb.jstream.config.JstreamConf;
-import com.jyb.main.JstreamServer;
 import com.jyb.yarn.SparkAppManager;
 import io.airlift.log.Logger;
 import org.apache.commons.lang3.StringUtils;
@@ -24,9 +23,10 @@ import scala.Tuple2;
 
 import javax.inject.Inject;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static java.util.Objects.requireNonNull;
 
 public class JobImpl extends CompositeService implements Job {
     private static final Logger log = Logger.get(JobImpl.class);
@@ -42,19 +42,21 @@ public class JobImpl extends CompositeService implements Job {
 
     private YarnClient yarnClient;
 
+    private StatementParser parser;
+
 
     @Inject
     public JobImpl(JstreamConf jstreamConf,
                    JobStreamService jobStreamService, SparkAppManager sparkAppManager,
-                   YarnClient yarnClient) {
+                   YarnClient yarnClient, StatementParser parser) {
         super("job ");
         this.jstreamConf = jstreamConf;
         this.jobStreamService = jobStreamService;
         this.sparkAppManager = sparkAppManager;
         this.yarnClient = yarnClient;
-
-
+        this.parser = parser;
     }
+
 
     private void addStateMachine(String jobId, Dispatcher dispatcher, JobStateMachine jobStateMachine) {
         stateMachines.putIfAbsent(jobId, new Tuple2<>(dispatcher, jobStateMachine));
@@ -82,7 +84,7 @@ public class JobImpl extends CompositeService implements Job {
         //创建中央异步事件分发器
         Dispatcher dispatcher = new AsyncDispatcher();
         //创建状态机
-        JobStateMachine stateMachine = new JobStateMachine(yarnClient,dispatcher.getEventHandler(), jstreamConf, jobStreamService, sparkAppManager);
+        JobStateMachine stateMachine = new JobStateMachine(yarnClient, dispatcher.getEventHandler(), jstreamConf, jobStreamService, sparkAppManager);
         //将中央异步事件分发器和状态机进行绑定
         dispatcher.register(JobEventType.class, stateMachine);
         //启动中央异步事件分发器
@@ -105,7 +107,7 @@ public class JobImpl extends CompositeService implements Job {
             JobStateMachine.JobStateInternal jobStateInternal = JobStateMachine.JobStateInternal.valueOf(jobState);
             Dispatcher dispatcher = new AsyncDispatcher();
             JobStateMachine stateMachine =
-                    new JobStateMachine(yarnClient,dispatcher.getEventHandler(), jstreamConf, jobStreamService, sparkAppManager, jobStateInternal);
+                    new JobStateMachine(yarnClient, dispatcher.getEventHandler(), jstreamConf, jobStreamService, sparkAppManager, jobStateInternal);
             dispatcher.register(JobEventType.class, stateMachine);
             ((AsyncDispatcher) dispatcher).init(new Configuration());
             ((AsyncDispatcher) dispatcher).start();
@@ -115,12 +117,10 @@ public class JobImpl extends CompositeService implements Job {
     }
 
     @Override
-    public String saveJob(JstreamConfiguration jstreamConfiguration) {
-
-
+    public String saveJob(JstreamConfiguration jstreamConfiguration,String sql) {
         //获取jobid
         //保存到数据库
-        String jobid = jobStreamService.saveJob(createJobVo(jstreamConfiguration));
+        String jobid = jobStreamService.saveJob(createJobVo(jstreamConfiguration,sql));
 
         createJobstateMachine(jobid);
 
@@ -129,12 +129,22 @@ public class JobImpl extends CompositeService implements Job {
         getDispatcher(jobid).getEventHandler().handle(jobEvent);
 
         return jobid;
+    }
+
+    @Override
+    public String saveJob(String sql) {
+        JstreamConfiguration configuration = this.parser.parser(sql);
+        requireNonNull(configuration);
+        return saveJob(configuration,sql);
 
     }
 
-    private JobVo createJobVo(JstreamConfiguration jstreamConfiguration) {
+
+
+    private JobVo createJobVo(JstreamConfiguration jstreamConfiguration,String sql) {
         JobVo jobVo = new JobVo();
         jobVo.setConfiguration(jstreamConfiguration);
+        jobVo.setSqlStr(sql);
         return jobVo;
     }
 
@@ -173,7 +183,7 @@ public class JobImpl extends CompositeService implements Job {
     public void startJob(String jobId) {
 
         JstreamConfiguration conf = jobStreamService.getJob(jobId).getConfiguration();
-        JobEvent runEvent = new StartJobEvent(jstreamConf, jobId,conf.getResouceConfig());
+        JobEvent runEvent = new StartJobEvent(jstreamConf, jobId, conf.getResouceConfig());
         getDispatcher(jobId).getEventHandler().handle(runEvent);
     }
 
@@ -193,7 +203,7 @@ public class JobImpl extends CompositeService implements Job {
 
     @Override
     public boolean delJob(String jobId) {
-        if (stateMachines.get(jobId)!=null){
+        if (stateMachines.get(jobId) != null) {
             stateMachines.remove(jobId);
         }
         jobStreamService.delJob(jobId);
@@ -201,15 +211,24 @@ public class JobImpl extends CompositeService implements Job {
     }
 
     @Override
-    public void updateJob(JstreamConfiguration jstreamConfiguration, String jobId) {
-        jobStreamService.updateJobConfiguration(jstreamConfiguration,jobId);
+    public void updateJob(JstreamConfiguration jstreamConfiguration, String jobId,String sql) {
+        jobStreamService.updateJobConfiguration(jstreamConfiguration, jobId,sql);
     }
 
     @Override
+    public void updateJob(String id, String sql) {
+        JstreamConfiguration conf = this.parser.parser(sql);
+        updateJob(conf,id,sql);
+    }
+
+
+    @Override
     public JobVo getJob(String jobId) {
-        return jobStreamService.getJob(jobId);
+        JobVo job = jobStreamService.getJob(jobId);
+        return job;
 
     }
+
 
     @Override
     public long getProtocolVersion(String s, long l) throws IOException {

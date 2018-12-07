@@ -18,6 +18,7 @@ package com.jyb.parser.antlr;
 
 import com.google.common.collect.ImmutableList;
 import com.jyb.SqlBaseBaseVisitor;
+import com.jyb.SqlBaseLexer;
 import com.jyb.SqlBaseParser;
 import com.jyb.parser.antlr.tree.*;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -37,7 +38,23 @@ public class AstBuilder
         extends SqlBaseBaseVisitor<Node> {
 
     @Override
+    public Node visitWithResource(SqlBaseParser.WithResourceContext ctx) {
+
+        List<Property> properties = ImmutableList.of();
+        if (ctx.properties() != null) {
+            properties = visit(ctx.properties().property(), Property.class);
+        }
+
+        return new Resources(getLocation(ctx),properties);
+    }
+
+    @Override
     public Node visitInsertInto(SqlBaseParser.InsertIntoContext ctx) {
+
+        List<Property> properties = ImmutableList.of();
+        if (ctx.properties() != null) {
+            properties = visit(ctx.properties().property(), Property.class);
+        }
 
         QualifiedName qn = getQualifiedName(ctx.qualifiedName());
         ColumnAlias visit = null;
@@ -46,9 +63,8 @@ public class AstBuilder
         }
 
 
-        String queryStr = getNodeText(ctx.queryStr());
-
-        return new InsertInto(getLocation(ctx), qn, queryStr,visit);
+        String queryStr = getNodeText(ctx.queryStr2());
+        return new InsertInto(getLocation(ctx), qn, queryStr,visit,properties);
     }
 
     @Override
@@ -59,6 +75,8 @@ public class AstBuilder
         }).collect(Collectors.toList());
         return new ColumnAlias(getLocation(ctx), columnFiledList);
     }
+
+
 
 
     @Override

@@ -1,5 +1,6 @@
 package com.jyb.config;
 
+import com.jyb.sink.AbstractSinkConfig;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 
@@ -25,15 +26,14 @@ public class JstreamConfiguration implements Serializable, Writable {
     private ExtConfig extConfig;
 
     private Config sourceConfig;
-    private Config sinkConfig;
-
+    private AbstractSinkConfig sinkConfig;
 
 
     private List<SqlEntry> sqlEntryList = new LinkedList<SqlEntry>() ;
 
     public JstreamConfiguration(){}
 
-    public JstreamConfiguration(ResouceConfig resouceConfig, ExtConfig extConfig, Config sourceConfig, Config sinkConfig) {
+    public JstreamConfiguration(ResouceConfig resouceConfig, ExtConfig extConfig, Config sourceConfig, AbstractSinkConfig sinkConfig) {
         this.resouceConfig = requireNonNull(resouceConfig,"resouceConfig 必须不为null");
         this.extConfig = requireNonNull(extConfig,"extConfig必须不为null");
         this.sourceConfig = requireNonNull(sourceConfig,"sourceConfig必须不为null");
@@ -77,11 +77,11 @@ public class JstreamConfiguration implements Serializable, Writable {
         this.sourceConfig = sourceConfig;
     }
 
-    public Config getSinkConfig() {
+    public AbstractSinkConfig getSinkConfig() {
         return sinkConfig;
     }
 
-    public void setSinkConfig(Config sinkConfig) {
+    public void setSinkConfig(AbstractSinkConfig sinkConfig) {
         this.sinkConfig = sinkConfig;
     }
 
@@ -102,7 +102,7 @@ public class JstreamConfiguration implements Serializable, Writable {
         resouceConfig = (ResouceConfig) ObjectWritable.readObject(in,null);
         extConfig = (ExtConfig) ObjectWritable.readObject(in,null);
         sourceConfig = (Config) ObjectWritable.readObject(in,null);
-        sinkConfig = (Config) ObjectWritable.readObject(in,null);
+        sinkConfig = (AbstractSinkConfig) ObjectWritable.readObject(in,null);
         SqlEntry[] ens = (SqlEntry[]) ObjectWritable.readObject(in,null);
         //String[] sqls = WritableUtils.readCompressedStringArray(in);
         Arrays.stream(ens).forEach(sqlEntryList::add);

@@ -27,7 +27,7 @@ import static java.util.Objects.requireNonNull;
 public class CreateTable
         extends Statement
 {
-    public enum Type
+    public static enum Type
     {
         SINK,
         SOURCE,

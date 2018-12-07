@@ -33,6 +33,7 @@ statement
          (COMMENT string)?
          (WITH properties)?
          (WATERMARK watermark)?                                         #createTable
+    | WITH RESOURCES properties                                          #withResource
     | USE schema=identifier                                            #use
     | USE catalog=identifier '.' schema=identifier                     #use
     | CREATE SCHEMA (IF NOT EXISTS)? qualifiedName
@@ -48,7 +49,7 @@ statement
          (COMMENT string)?
          (WITH properties)?                                            #createTable
     | DROP TABLE (IF EXISTS)? qualifiedName                            #dropTable
-    | INSERT INTO qualifiedName columnAliases? queryStr                #insertInto
+    | WITH properties INSERT INTO qualifiedName columnAliases? queryStr2      #insertInto
     | DELETE FROM qualifiedName (WHERE booleanExpression)?             #delete
     | ALTER TABLE from=qualifiedName RENAME TO to=qualifiedName        #renameTable
     | ALTER TABLE tableName=qualifiedName
@@ -117,6 +118,10 @@ queryStream
 
 queryStr
     : SELECT (.*?)
+    ;
+
+queryStr2
+    : SELECT .*
     ;
 
 with
@@ -674,6 +679,7 @@ VIEW: 'VIEW';
 WHEN: 'WHEN';
 WHERE: 'WHERE';
 WITH: 'WITH';
+RESOURCES: 'RESOURCES';
 WATERMARK: 'WATERMARK';
 WORK: 'WORK';
 WRITE: 'WRITE';

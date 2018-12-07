@@ -203,9 +203,9 @@ public class JstreamConfigutationUtils {
                 int pos = StringUtils.lastIndexOf(two, ")");
                 String clause=StringUtils.substring(two,0,pos).trim();
                 String aliase = StringUtils.substring(two,pos+1,two.length()).trim().replaceAll("as ","").trim();
-                return new SqlEntry(clause,aliase);
+                return new SqlEntry(clause,aliase,null);
             }else{
-                return new SqlEntry(sql,"");
+                return new SqlEntry(sql,"",null);
             }
         }catch (Exception ex){
             ex.printStackTrace();

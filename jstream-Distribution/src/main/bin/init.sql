@@ -6,5 +6,6 @@ CREATE TABLE "t_jstream_job" (
   "applicationId" varchar(255) DEFAULT NULL,
   "applicationState" varchar(255) CHARACTER SET koi8u DEFAULT NULL,
   "configuration" blob,
+  "sqlStr" varchar(5000) CHARACTER SET utf8 DEFAULT NULL,
   PRIMARY KEY ("id")
 );

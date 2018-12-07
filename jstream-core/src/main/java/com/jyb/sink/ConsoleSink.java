@@ -1,9 +1,6 @@
 package com.jyb.sink;
 
-import com.jyb.config.Config;
-import com.jyb.config.JstreamContext;
-import com.jyb.config.OutPutModeConfig;
-import com.jyb.config.TriggerConfig;
+import com.jyb.config.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
@@ -39,21 +36,21 @@ public class ConsoleSink extends AbstractSink implements JstreamSink {
                 context.getConfiguration().getExtConfig().getSparkCheckPointPath());
     }
 
-    public static class ConsoleSinkConfig implements Config, Writable {
+    @Name("consoleSink")
+    public static class ConsoleSinkConfig extends AbstractSinkConfig implements Config, Writable {
 
-        private OutPutModeConfig outPutModeConfig;
-
-        private TriggerConfig triggerConfig;
-
+        @Name("sink.console.numRows")
         String numRows="100";
 
+        @Name("sink.console.truncate")
         String truncate="false";
 
         public ConsoleSinkConfig() {
-
+            super(null,null);
         }
 
         public ConsoleSinkConfig(OutPutModeConfig outPutModeConfig, TriggerConfig triggerConfig, String numRows, String truncate) {
+            super(outPutModeConfig,triggerConfig);
             this.outPutModeConfig = requireNonNull(outPutModeConfig,"outputmodeconfig不能为null");
             this.triggerConfig = requireNonNull(triggerConfig,"triggerConfig不能为null");
             if (StringUtils.isNotBlank(numRows))
@@ -62,21 +59,7 @@ public class ConsoleSink extends AbstractSink implements JstreamSink {
                 this.truncate = truncate;
         }
 
-        public OutPutModeConfig getOutPutModeConfig() {
-            return outPutModeConfig;
-        }
 
-        public void setOutPutModeConfig(OutPutModeConfig outPutModeConfig) {
-            this.outPutModeConfig = outPutModeConfig;
-        }
-
-        public TriggerConfig getTriggerConfig() {
-            return triggerConfig;
-        }
-
-        public void setTriggerConfig(TriggerConfig triggerConfig) {
-            this.triggerConfig = triggerConfig;
-        }
 
         public String getNumRows() {
             return numRows;

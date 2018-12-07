@@ -17,6 +17,7 @@ public class JobVo implements Serializable, Writable {
     String applicationId;
     String applicationState;
     JstreamConfiguration configuration;
+    String sqlStr="";
 
     public String getAppName() {
         return appName;
@@ -74,6 +75,14 @@ public class JobVo implements Serializable, Writable {
         this.configuration = configuration;
     }
 
+    public String getSqlStr() {
+        return sqlStr;
+    }
+
+    public void setSqlStr(String sqlStr) {
+        this.sqlStr = sqlStr==null?"":sqlStr;
+    }
+
     @Override
     public void write(DataOutput dataOutput) throws IOException {
         dataOutput.writeInt(id);
@@ -83,6 +92,7 @@ public class JobVo implements Serializable, Writable {
         dataOutput.writeUTF(applicationId);
         dataOutput.writeUTF(applicationState);
         ObjectWritable.writeObject(dataOutput,configuration, configuration.getClass(),null);
+        dataOutput.writeUTF(sqlStr);
     }
 
     @Override
@@ -94,6 +104,7 @@ public class JobVo implements Serializable, Writable {
         applicationId = dataInput.readUTF();
         applicationState = dataInput.readUTF();
         configuration = (JstreamConfiguration) ObjectWritable.readObject(dataInput,null);
+        sqlStr = dataInput.readUTF();
 
     }
 }

@@ -1,12 +1,14 @@
 package com.jyb.module;
 
 import com.google.inject.*;
-import com.jyb.core.JobManager;
+import com.jyb.core.StatementParser;
+import com.jyb.core.StatementParserImpl;
 import com.jyb.db.JobStreamService;
 import com.jyb.job.Job;
 import com.jyb.job.JobImpl;
 import com.jyb.jstream.config.JstreamConf;
 import com.jyb.main.JstreamServer;
+import com.jyb.parser.antlr.AntlrSqlParser;
 import com.jyb.rpc.JstreamRpcServer;
 import com.jyb.yarn.SparkAppManager;
 import org.apache.hadoop.conf.Configuration;
@@ -22,7 +24,6 @@ import static io.airlift.configuration.ConfigBinder.configBinder;
 public class ServerModule implements Module {
     @Override
     public void configure(Binder binder) {
-        binder.bind(JobManager.class).in(Scopes.SINGLETON);
         binder.bind(JstreamServer.class).in(Scopes.SINGLETON);
         binder.bind(Configuration.class).toInstance(new Configuration());
         binder.bind(JstreamRpcServer.class).in(Scopes.SINGLETON);
@@ -34,6 +35,8 @@ public class ServerModule implements Module {
         binder.bind(YarnClient.class).toProvider(YarnClientProvider.class).in(Scopes.SINGLETON);
         binder.bind(SparkAppManager.class).in(Scopes.SINGLETON);
         binder.bind(JobStreamService.class).in(Scopes.SINGLETON);
+        binder.bind(AntlrSqlParser.class).in(Scopes.SINGLETON);
+        binder.bind(StatementParser.class).to(StatementParserImpl.class).in(Scopes.SINGLETON);
 
 
 

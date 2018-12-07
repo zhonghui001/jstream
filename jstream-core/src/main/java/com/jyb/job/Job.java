@@ -12,9 +12,11 @@ public interface Job extends VersionedProtocol {
 
     public static final long versionID = 1L;
 
-    public String saveJob(JstreamConfiguration jstreamConfiguration);
+    default public String saveJob(JstreamConfiguration jstreamConfiguration,String sql){
+        throw new RuntimeException("不支持该方法，该方法是v1.0版本");
+    }
 
-    public void updateJob(JstreamConfiguration jstreamConfiguration,String jobId);
+    public void updateJob(JstreamConfiguration jstreamConfiguration,String jobId,String sql);
 
     public JobVoList listJobs();
 
@@ -25,5 +27,10 @@ public interface Job extends VersionedProtocol {
     public boolean delJob(String jobId);
 
     public JobVo getJob(String jobId);
+
+    public void updateJob(String id,String sql);
+    default public String saveJob(String sql){
+        throw new RuntimeException("不支持该方法，该方法是v2.0版本");
+    }
 
 }

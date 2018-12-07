@@ -1,9 +1,6 @@
 package com.jyb.sink;
 
-import com.jyb.config.Config;
-import com.jyb.config.JstreamContext;
-import com.jyb.config.OutPutModeConfig;
-import com.jyb.config.TriggerConfig;
+import com.jyb.config.*;
 import com.jyb.sink.writer.RedisForeachWritter;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
@@ -30,15 +27,24 @@ public class RedisSink extends AbstractSink implements JstreamSink {
     }
 
 
-    public static class RedisSinkConfig implements Config, Writable {
+    @Name("redisSink")
+    public static class RedisSinkConfig extends AbstractSinkConfig implements Config, Writable {
         private static final long serialVersionUID = 3044422946500893519L;
-        String host;
-        Integer port = 6739;
-        Integer dbNo;
-        String redisKey;
 
-        private OutPutModeConfig outPutModeConfig;
-        private TriggerConfig triggerConfig;
+        @NotNull
+        @Name("sink.redis.host")
+        String host;
+
+        @Name("sink.redis.port")
+        Integer port = 6739;
+
+        @NotNull
+        @Name("sink.redis.dbno")
+        Integer dbNo;
+
+        @NotNull
+        @Name("sink.redis.redisKey")
+        String redisKey;
 
 
         @Override
@@ -64,15 +70,15 @@ public class RedisSink extends AbstractSink implements JstreamSink {
         }
 
         public RedisSinkConfig(String host, Integer port, Integer dbNo, String redisKey, OutPutModeConfig outPutModeConfig, TriggerConfig triggerConfig) {
+            super(outPutModeConfig,triggerConfig);
             this.host = requireNonNull(host);
             this.port = requireNonNull(port);
             this.dbNo = requireNonNull(dbNo);
             this.redisKey = requireNonNull(redisKey);
-            this.outPutModeConfig = requireNonNull(outPutModeConfig);
-            this.triggerConfig = requireNonNull(triggerConfig);
         }
 
         public RedisSinkConfig() {
+            super(null,null);
         }
 
         public String getHost() {
@@ -107,21 +113,6 @@ public class RedisSink extends AbstractSink implements JstreamSink {
             this.redisKey = redisKey;
         }
 
-        public OutPutModeConfig getOutPutModeConfig() {
-            return outPutModeConfig;
-        }
-
-        public void setOutPutModeConfig(OutPutModeConfig outPutModeConfig) {
-            this.outPutModeConfig = outPutModeConfig;
-        }
-
-        public TriggerConfig getTriggerConfig() {
-            return triggerConfig;
-        }
-
-        public void setTriggerConfig(TriggerConfig triggerConfig) {
-            this.triggerConfig = triggerConfig;
-        }
 
 
     }

@@ -1,9 +1,6 @@
 package com.jyb.sink;
 
-import com.jyb.config.Config;
-import com.jyb.config.JstreamContext;
-import com.jyb.config.OutPutModeConfig;
-import com.jyb.config.TriggerConfig;
+import com.jyb.config.*;
 import com.jyb.sink.writer.JdbcForeachWriter;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
@@ -35,35 +32,48 @@ public class MysqlSink extends AbstractSink implements JstreamSink {
     }
 
 
-    public static class MysqlSinkConfig implements Config, Writable {
+    @Name("mysqlSink")
+    public static class MysqlSinkConfig extends AbstractSinkConfig implements Config, Writable {
 
 
         private static final long serialVersionUID = 5322425870670043910L;
+        @NotNull
+        @Name("sink.mysql.url")
         String url;
+
+        @NotNull
+        @Name("sink.mysql.userName")
         String userName;
+
+        @NotNull
+        @Name("sink.mysql.password")
         String password;
+
+        @Name("sink.mysql.driver")
         String driver = "com.mysql.jdbc.Driver";
 
+        @NotNull
+        @Name("sink.mysql.dbName")
         String dbName;
-        String table;
 
-        private OutPutModeConfig outPutModeConfig;
-        private TriggerConfig triggerConfig;
+        @NotNull
+        @Name("sink.mysql.table")
+        String table;
 
 
         public MysqlSinkConfig() {
-
+            super(null,null);
         }
 
         public MysqlSinkConfig(String url, String userName, String password, String dbName, String table,
                                OutPutModeConfig outPutModeConfig, TriggerConfig triggerConfig) {
+            super(outPutModeConfig,triggerConfig);
             this.url = requireNonNull(url);
             this.userName = requireNonNull(userName);
             this.password = requireNonNull(password);
             this.dbName = requireNonNull(dbName);
             this.table = requireNonNull(table);
-            this.outPutModeConfig = requireNonNull(outPutModeConfig);
-            this.triggerConfig = requireNonNull(triggerConfig);
+
 
         }
 
@@ -146,21 +156,6 @@ public class MysqlSink extends AbstractSink implements JstreamSink {
             this.table = table;
         }
 
-        public OutPutModeConfig getOutPutModeConfig() {
-            return outPutModeConfig;
-        }
-
-        public void setOutPutModeConfig(OutPutModeConfig outPutModeConfig) {
-            this.outPutModeConfig = outPutModeConfig;
-        }
-
-        public TriggerConfig getTriggerConfig() {
-            return triggerConfig;
-        }
-
-        public void setTriggerConfig(TriggerConfig triggerConfig) {
-            this.triggerConfig = triggerConfig;
-        }
 
         @Override
         public String toString() {

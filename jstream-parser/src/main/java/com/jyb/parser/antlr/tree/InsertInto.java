@@ -24,16 +24,18 @@ import java.util.Optional;
 public class InsertInto
         extends Statement
 {
+    private final List<Property> properties;
     private final QualifiedName qualifiedName;
     private final String query;
     private ColumnAlias columnAlias;
 
-    public InsertInto(NodeLocation location, QualifiedName qualifiedName,String query,ColumnAlias columnAlias)
+    public InsertInto(NodeLocation location, QualifiedName qualifiedName,String query,ColumnAlias columnAlias,List<Property> properties)
     {
         super(Optional.of(location));
         this.qualifiedName = qualifiedName;
         this.query = query;
         this.columnAlias = columnAlias;
+        this.properties = properties;
     }
 
     @Override
@@ -41,14 +43,15 @@ public class InsertInto
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         InsertInto that = (InsertInto) o;
-        return Objects.equals(qualifiedName, that.qualifiedName) &&
+        return Objects.equals(properties, that.properties) &&
+                Objects.equals(qualifiedName, that.qualifiedName) &&
                 Objects.equals(query, that.query) &&
                 Objects.equals(columnAlias, that.columnAlias);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(qualifiedName, query, columnAlias);
+        return Objects.hash(properties, qualifiedName, query, columnAlias);
     }
 
     public QualifiedName getQualifiedName() {
@@ -74,10 +77,15 @@ public class InsertInto
     }
 
 
+    public List<Property> getProperties() {
+        return properties;
+    }
+
     @Override
     public String toString() {
         return "InsertInto{" +
-                "qualifiedName=" + qualifiedName +
+                "properties=" + properties +
+                ", qualifiedName=" + qualifiedName +
                 ", query='" + query + '\'' +
                 ", columnAlias=" + columnAlias +
                 '}';

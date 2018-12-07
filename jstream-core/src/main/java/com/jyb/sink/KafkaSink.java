@@ -1,16 +1,12 @@
 package com.jyb.sink;
 
-import com.jyb.config.Config;
-import com.jyb.config.JstreamContext;
-import com.jyb.config.OutPutModeConfig;
-import com.jyb.config.TriggerConfig;
+import com.jyb.config.*;
 import org.apache.hadoop.io.ObjectWritable;
 import org.apache.hadoop.io.Writable;
 import org.apache.spark.sql.Column;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.streaming.DataStreamWriter;
-import scala.collection.mutable.Seq;
 
 
 import java.io.DataInput;
@@ -52,25 +48,27 @@ public class KafkaSink extends AbstractSink implements JstreamSink {
 
 
 
-    public static class KafkaSinkConfig implements Config, Writable{
+    @Name("kafkaSink")
+    public static class KafkaSinkConfig extends AbstractSinkConfig implements Writable{
 
         private static final long serialVersionUID = 4012041513996711004L;
+        @NotNull
+        @Name("sink.kafka.server")
         private String server;
 
+        @NotNull
+        @Name("sink.kafka.topic")
         private String topic;
 
-
-        private OutPutModeConfig outPutModeConfig;
-        private TriggerConfig triggerConfig;
-
         public KafkaSinkConfig() {
+            super(null,null);
         }
 
         public KafkaSinkConfig(String server, String topic, OutPutModeConfig outPutModeConfig, TriggerConfig triggerConfig) {
+            super(outPutModeConfig,triggerConfig);
             this.server = requireNonNull(server);
             this.topic = requireNonNull(topic);
-            this.outPutModeConfig = requireNonNull(outPutModeConfig);
-            this.triggerConfig = requireNonNull(triggerConfig);
+
         }
 
         @Override
@@ -105,20 +103,6 @@ public class KafkaSink extends AbstractSink implements JstreamSink {
             this.topic = topic;
         }
 
-        public OutPutModeConfig getOutPutModeConfig() {
-            return outPutModeConfig;
-        }
 
-        public void setOutPutModeConfig(OutPutModeConfig outPutModeConfig) {
-            this.outPutModeConfig = outPutModeConfig;
-        }
-
-        public TriggerConfig getTriggerConfig() {
-            return triggerConfig;
-        }
-
-        public void setTriggerConfig(TriggerConfig triggerConfig) {
-            this.triggerConfig = triggerConfig;
-        }
     }
 }

@@ -32,4 +32,12 @@ public abstract class Expression
     {
         throw new UnsupportedOperationException(format("not yet implemented: %s.visit%s", getClass().getName(), this.getClass().getSimpleName()));
     }
+
+    public String unwarpExpressValue(){
+        String s = toString();
+        if (s!=null){
+            return s.replaceAll("'","");
+        }
+        return null;
+    }
 }

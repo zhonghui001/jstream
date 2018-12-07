@@ -3,7 +3,6 @@ package com.jyb.main;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Injector;
 import com.google.inject.Module;
-import com.jyb.core.JobManager;
 import com.jyb.jstream.config.JstreamConf;
 import com.jyb.module.ServerModule;
 import com.jyb.rpc.JstreamRpcServer;
@@ -24,7 +23,6 @@ public class JstreamServer extends CompositeService {
 
     private static final Logger log = Logger.get(JstreamServer.class);
 
-    private JobManager jobManager;
 
     private JstreamRpcServer rpcServer;
 
@@ -34,11 +32,10 @@ public class JstreamServer extends CompositeService {
      *
      */
     @Inject
-    public JstreamServer(JobManager jobManager,JstreamConf jstreamConf,
+    public JstreamServer(JstreamConf jstreamConf,
                          JstreamRpcServer rpcServer) {
         super("JstreamServer");
 
-        this.jobManager = requireNonNull(jobManager,"jobmanager guice注入失败");
         this.jstreamConf = requireNonNull(jstreamConf,"jstream.properties配置文件注入失败");
         this.rpcServer = requireNonNull(rpcServer,"rpcserver guice注入失败");
     }
